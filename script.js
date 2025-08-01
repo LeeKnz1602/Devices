@@ -19,10 +19,6 @@ function loadData() {
     });
 }
 
-function simpanKeLocalStorage() {
-  localStorage.setItem("dataList", JSON.stringify(dataList));
-}
-
 function renderTable(data, isSearch = false) {
   const tbody = document.getElementById("data-body");
   tbody.innerHTML = "";
@@ -170,15 +166,3 @@ function cariData() {
     );
   renderTable(hasil, true);
 }
-
-const express = require('express');
-const app = express();  
-const port = 3000;
-
-app.get('/data', (req, res) => {
-    res.json({ message: 'Data berhasil diambil' });
-});
-
-app.listen(port, () => {
-    console.log(`Server berjalan di http://localhost:${port}`);
-});

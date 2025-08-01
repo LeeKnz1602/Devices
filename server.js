@@ -67,4 +67,4 @@ app.delete("/data/:id", (req, res) => {
   });
 });
 
-app.listen(3000, () => console.log("Server running on port 3306"));
+app.listen(3000, () => console.log("Server running on port 3000"));
