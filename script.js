@@ -2,7 +2,7 @@ let dataList = [];
 let currentIndex = null;
 
 window.onload = function () {
-  fetch("http://localhost:3306/data")
+  fetch("http://localhost:3000/data")
     .then(res => res.json())
     .then(data => {
       dataList = data;
@@ -11,7 +11,7 @@ window.onload = function () {
 };
 
 function loadData() {
-  fetch("http://localhost:3306/data")
+  fetch("http://localhost:3000/data")
     .then(res => res.json())
     .then(data => {
       dataList = data;
@@ -70,7 +70,7 @@ function tambahData() {
     alert("Data yang sama sudah ada!");
     return;
   }
-  fetch("http://localhost:3306/data", {
+  fetch("http://localhost:3000/data", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ nama, device, serial })
@@ -83,7 +83,7 @@ function tambahData() {
 
 function hapusData(id) {
   if (confirm("Yakin ingin menghapus data ini?")) {
-    fetch(`http://localhost:3306/data/${id}`, { method: "DELETE" })
+    fetch(`http://localhost:3000/data/${id}`, { method: "DELETE" })
       .then(() => loadData());
   }
 }
@@ -131,7 +131,7 @@ function saveEdit() {
   const newSerial = document.getElementById("editSerial").value.trim();
   const newNote = document.getElementById("editNote").value.trim();
 
-  fetch(`http://localhost:3306/data/${dataList[currentIndex].id}`, {
+  fetch(`http://localhost:3000/data/${dataList[currentIndex].id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ nama: newNama, device: newDevice, serial: newSerial, note: newNote })
@@ -170,3 +170,15 @@ function cariData() {
     );
   renderTable(hasil, true);
 }
+
+const express = require('express');
+const app = express();  
+const port = 3000;
+
+app.get('/data', (req, res) => {
+    res.json({ message: 'Data berhasil diambil' });
+});
+
+app.listen(port, () => {
+    console.log(`Server berjalan di http://localhost:${port}`);
+});
