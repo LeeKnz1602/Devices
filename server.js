@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "123456",
+  password: "",
   database: "Devices"
 });
 
@@ -25,7 +25,7 @@ db.connect(err => {
 
 // API data
 app.get("/data", (req, res) => {
-  db.query("SELECT * FROM data_list", (err, results) => {
+  db.query("SELECT * FROM datadevice", (err, results) => {
     if (err) return res.status(500).json({ error: err });
     res.json(results);
   });
@@ -35,7 +35,7 @@ app.get("/data", (req, res) => {
 app.post("/data", (req, res) => {
   const { nama, device, serial, note } = req.body;
   db.query(
-    "INSERT INTO data_list (nama, device, serial, note) VALUES (?, ?, ?, ?)",
+    "INSERT INTO datadevice (nama, device, serial, note) VALUES (?, ?, ?, ?)",
     [nama, device, serial, note || ""],
     (err, result) => {
       if (err) return res.status(500).json({ error: err });
@@ -49,7 +49,7 @@ app.put("/data/:id", (req, res) => {
   const { id } = req.params;
   const { nama, device, serial, note } = req.body;
   db.query(
-    "UPDATE data_list SET nama=?, device=?, serial=?, note=? WHERE id=?",
+    "UPDATE datadevice SET nama=?, device=?, serial=?, note=? WHERE id=?",
     [nama, device, serial, note, id],
     (err, result) => {
       if (err) return res.status(500).json({ error: err });
@@ -61,10 +61,10 @@ app.put("/data/:id", (req, res) => {
 // API hapus data
 app.delete("/data/:id", (req, res) => {
   const { id } = req.params;
-  db.query("DELETE FROM data_list WHERE id=?", [id], (err, result) => {
+  db.query("DELETE FROM datadevice WHERE id=?", [id], (err, result) => {
     if (err) return res.status(500).json({ error: err });
     res.json({ message: "Data deleted" });
   });
 });
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+app.listen(3000, () => console.log("Server running on port 3306"));
