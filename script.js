@@ -2,12 +2,22 @@ let dataList = [];
 let currentIndex = null;
 
 window.onload = function () {
-  const savedData = localStorage.getItem("dataList");
-  if (savedData) {
-    dataList = JSON.parse(savedData);
-  }
-  renderTable(dataList);
+  fetch("http://localhost:3000/data")
+    .then(res => res.json())
+    .then(data => {
+      dataList = data;
+      renderTable(dataList);
+    });
 };
+
+function loadData() {
+  fetch("http://localhost:3000/data")
+    .then(res => res.json())
+    .then(data => {
+      dataList = data;
+      renderTable(dataList);
+    });
+}
 
 function simpanKeLocalStorage() {
   localStorage.setItem("dataList", JSON.stringify(dataList));
@@ -41,7 +51,6 @@ function updateNote(index, newNote) {
   simpanKeLocalStorage();
 }
 function tambahData() {
-  simpanKeLocalStorage();
   const nama = document.getElementById("nama").value.trim();
   const device = document.getElementById("device").value.trim();
   const serial = document.getElementById("serial").value.trim();
@@ -53,27 +62,29 @@ function tambahData() {
   const isDuplicate = dataList.some(
     (item) =>
       item.nama.toLowerCase() === nama.toLowerCase() &&
-      item.device.toLowerCase() === device.toLowerCase() &&
-      item.serial.toLowerCase() === device.toLowerCase()
+    item.device.toLowerCase() === device.toLowerCase() &&
+    item.serial.toLowerCase() === device.toLowerCase()
   );
 
   if (isDuplicate) {
     alert("Data yang sama sudah ada!");
     return;
   }
-  dataList.push({ nama, device, serial });
-  document.getElementById("nama").value = "";
-  document.getElementById("device").value = "";
-  document.getElementById("serial").value = "";
-  simpanKeLocalStorage();
-  renderTable(dataList);
-}
+  fetch("http://localhost:3000/data", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nama, device, serial })
+  })
+    .then(res => res.json())
+    .then(() => {
+      loadData(); // ambil ulang dari DB
+    });
+  }
 
-function hapusData(index) {
+function hapusData(id) {
   if (confirm("Yakin ingin menghapus data ini?")) {
-    dataList.splice(index, 1);
-    simpanKeLocalStorage();
-    renderTable(dataList);
+    fetch(`http://localhost:3000/data/${id}`, { method: "DELETE" })
+      .then(() => loadData());
   }
 }
 
@@ -120,21 +131,15 @@ function saveEdit() {
   const newSerial = document.getElementById("editSerial").value.trim();
   const newNote = document.getElementById("editNote").value.trim();
 
-  if (!newNama || !newDevice || !newSerial) {
-    alert("Semua field harus diisi!");
-    return;
-  }
-
-  dataList[currentIndex] = {
-    nama: newNama,
-    device: newDevice,
-    serial: newSerial,
-    note: newNote,
-  };
-
-  simpanKeLocalStorage();
-  renderTable(dataList);
-  closeModal();
+  fetch(`http://localhost:3000/data/${dataList[currentIndex].id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nama: newNama, device: newDevice, serial: newSerial, note: newNote })
+  })
+    .then(() => {
+      loadData();
+      closeModal();
+    });
 }
 
 function closeModal() {
